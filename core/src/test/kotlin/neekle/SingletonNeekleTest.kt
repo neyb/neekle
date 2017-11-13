@@ -4,7 +4,7 @@ import io.github.neyb.shoulk.shouldBe
 import io.github.neyb.shoulk.shouldEqual
 import org.junit.jupiter.api.Test
 
-class BasicNeekleTest {
+class SingletonNeekleTest {
     @Test fun `creating an empty neekle`() {
         Neekle {}
     }
@@ -24,4 +24,6 @@ class BasicNeekleTest {
 
         injector<String>() shouldBe injector()
     }
+
+
 }

@@ -1,3 +1,3 @@
 package neekle
 
-class SeveralParticlesFound(criteria: BindingCriteria<*>) : Exception()
+class SeveralParticlesFound(criteria: BindingCriteria<*>, map: List<BindingDefinition>) : Exception()

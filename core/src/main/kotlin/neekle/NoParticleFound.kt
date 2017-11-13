@@ -1,5 +1,5 @@
 package neekle
 
-class NoParticleFound(criteria: BindingCriteria<*>, bindings: Collection<Binding<*>>) : Exception() {
+class NoParticleFound(criteria: BindingCriteria<*>) : Exception() {
 
 }

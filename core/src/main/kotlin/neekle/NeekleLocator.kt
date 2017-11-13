@@ -10,9 +10,9 @@ internal class NeekleLocator(private val module: Module) : Locator {
             BindingCriteria(type, definition).let { criteria ->
                 module.getBindings(criteria).let { bindings ->
                     when {
-                        bindings.isEmpty() -> throw NoParticleFound(criteria, bindings)
                         bindings.size == 1 -> bindings.single().provider.get(injector)
-                        bindings.size > 1 -> throw SeveralParticlesFound(criteria)
+                        bindings.isEmpty() -> throw NoParticleFound(criteria)
+                        bindings.size > 1 -> throw SeveralParticlesFound(criteria, bindings.map { it.definition })
                         else -> throw IllegalStateException("bindings has negative size ???")
                     }
                 }
