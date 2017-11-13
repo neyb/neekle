@@ -1,4 +1,4 @@
 package neekle
 
-class BindingInConflict : Exception() {
+class BindingInConflict(criteria: BindingCriteria<*>, matchingDefinition: List<BindingDefinition>) : Exception() {
 }

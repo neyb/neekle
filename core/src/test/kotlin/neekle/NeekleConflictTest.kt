@@ -15,6 +15,16 @@ class NeekleConflictTest {
         } shouldThrow BindingInConflict::class
     }
 
+    @Test fun `registering several binding in conflict should fail with fail policy`() {
+        {
+            Neekle {
+                
+                bind<String>() with Singleton { "instance1" }
+                bind<String>() with Singleton { "instance2" }
+            }
+        } shouldThrow BindingInConflict::class
+    }
+
     @Test fun `registering several string can be get as collection`() {
         val injector = Neekle {
             bind<String>() with Singleton { "instance1" }
