@@ -1,0 +1,6 @@
+dependencies {
+    compile project(':neekle-inject-api')
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    compile 'org.springframework:spring-core:5.0.1.RELEASE'
+    compile 'org.springframework:spring-context:5.0.1.RELEASE'
+}

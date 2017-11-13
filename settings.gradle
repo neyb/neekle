@@ -1,2 +1,12 @@
 rootProject.name = 'neekle-parent'
 
+include 'core',
+        'inject/api',
+        'inject/spring', 'inject/sample/spring'
+
+findProject(':core')?.name = 'neekle-core'
+findProject(':inject/api')?.name = 'neekle-inject-api'
+findProject(':inject/spring')?.name = 'neekle-inject-spring'
+findProject(':inject/sample/spring')?.name = 'neekle-inject-spring-sample'
+findProject(':core')?.name = 'neekle-core'
+
