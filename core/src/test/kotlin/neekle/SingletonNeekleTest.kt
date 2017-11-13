@@ -24,6 +24,4 @@ class SingletonNeekleTest {
 
         injector<String>() shouldBe injector()
     }
-
-
 }
