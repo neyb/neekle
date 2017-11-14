@@ -2,7 +2,7 @@
 /gradle
 /gradlew*
 /.gradle
-build
+createProvider
 out
 
 #idea

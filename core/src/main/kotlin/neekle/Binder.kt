@@ -1,7 +1,13 @@
 package neekle
 
-class Binder<in T>(
-        private val bind: (ParticleProvider<T>) -> Unit) {
+import neekle.inject.api.Injector
 
-    infix fun with(provider: ParticleProvider<T>) = bind(provider)
+class Binder<in T>(private val bind: (ParticleProvider<T>) -> Unit) {
+
+    infix fun to(provider: ParticleProvider<T>) = bind(provider)
+    infix fun to(instance: T) = to(InstanceProvider(instance))
+
+    private class InstanceProvider<out T>(private val instance: T) : ParticleProvider<T> {
+        override fun get(injector: Injector) = instance
+    }
 }
