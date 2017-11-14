@@ -8,7 +8,10 @@ class Module(parentConflictPolicy: ConflictPolicy? = null) {
     private val bindings = Bindings()
     private val subModules = Modules()
 
-    inline fun <reified T> bind(particleType: ParticleType = singleton, name: String? = null, noinline init: (Injector) -> T) {
+    inline fun <reified T> bind(
+            particleType: ParticleType = singleton,
+            name: String? = null,
+            noinline init: (Injector) -> T) {
         bind(T::class.java, name, particleType.createProvider(init))
     }
 
@@ -16,16 +19,24 @@ class Module(parentConflictPolicy: ConflictPolicy? = null) {
         val criteria = BindingCriteria(target, name)
         val existingMatchingDefinition = getBindingsInConflict(criteria).map { it.definition }
 
-        val bindAction: BindAction = if (existingMatchingDefinition.isEmpty()) add
-        else conflictPolicy.actionFor(criteria.targetType) ?: throw BindingInConflict(criteria, existingMatchingDefinition)
-
-        when (bindAction) {
+        when (actionFor(criteria, existingMatchingDefinition)) {
             ignore -> Unit
             add -> add(target, provider)
             replace -> bindings.replace(criteria, Binding(BindingDefinition.Assignable(target), provider))
             fail -> throw BindingAlreadyPresent(criteria, existingMatchingDefinition)
         }
     }
+
+    private fun <T> actionFor(
+            criteria: BindingCriteria<T>,
+            existingMatchingDefinition: List<BindingDefinition>) =
+            if (existingMatchingDefinition.isEmpty()) add
+            else getActionForConflict(criteria, existingMatchingDefinition)
+
+    private fun <T> getActionForConflict(
+            criteria: BindingCriteria<T>,
+            existingMatchingDefinition: List<BindingDefinition>) =
+            conflictPolicy.actionFor(criteria.targetType) ?: throw BindingInConflict(criteria, existingMatchingDefinition)
 
     fun onAnyConflict(defaultAction: BindAction) {
         conflictPolicy.defaultPolicyElement = defaultAction.always
