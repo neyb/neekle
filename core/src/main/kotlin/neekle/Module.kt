@@ -3,40 +3,47 @@ package neekle
 import neekle.BindAction.*
 import neekle.inject.api.Injector
 
-class Module(parentConflictPolicy: ConflictPolicy? = null) {
+class Module internal constructor(parentConflictPolicy: ConflictPolicy? = null) {
     private val conflictPolicy = ConflictPolicy(parentConflictPolicy)
     private val bindings = Bindings()
     private val subModules = Modules()
 
     inline fun <reified T> bind(
-            particleType: ParticleType = singleton,
             name: String? = null,
-            noinline init: (Injector) -> T) {
+            particleType: ParticleType = singleton,
+            noinline init: (Injector) -> T) =
         bind(T::class.java, name, particleType.createProvider(init))
-    }
 
     fun <T> bind(target: Class<T>, name: String? = null, provider: ParticleProvider<T>) {
-        val criteria = BindingCriteria(target, name)
-        val existingMatchingDefinition = getBindingsInConflict(criteria).map { it.definition }
+        fun getConflictDefinitionOrNull(bindingDefinition: BindingDefinition<*>) =
+                conflictPolicy.getApplicablePolicyType(bindingDefinition.type)
+                        ?.let { bindingDefinition.copy(type = it) }
 
-        when (actionFor(criteria, existingMatchingDefinition)) {
+        fun getBindingsInConflict(bindingDefinition: BindingDefinition<*>) =
+                (getConflictDefinitionOrNull(bindingDefinition) ?: bindingDefinition)
+                        .let { bindings.inConflict(it) }
+
+        fun <T> getActionForConflict(
+                definition: BindingDefinition<T>,
+                existingMatchingSpecification: List<BindingDefinition<*>>) =
+                conflictPolicy.actionFor(definition.type) ?: throw BindingInConflict(definition, existingMatchingSpecification)
+
+        fun <T> actionFor(
+                definition: BindingDefinition<T>,
+                existingMatchingDefinition: List<BindingDefinition<*>>) =
+                if (existingMatchingDefinition.isEmpty()) add
+                else getActionForConflict(definition, existingMatchingDefinition)
+
+        val definition = BindingDefinition(target, name)
+        val existingMatchingDefinition = getBindingsInConflict(definition).map { it.definition }
+
+        when (actionFor(definition, existingMatchingDefinition)) {
             ignore -> Unit
-            add -> add(target, provider)
-            replace -> bindings.replace(criteria, Binding(BindingDefinition.Assignable(target), provider))
-            fail -> throw BindingAlreadyPresent(criteria, existingMatchingDefinition)
+            add -> bindings.add(Binding(definition, provider))
+            replace -> bindings.replace(Binding(definition, provider))
+            fail -> throw BindingAlreadyPresent(definition, existingMatchingDefinition)
         }
     }
-
-    private fun <T> actionFor(
-            criteria: BindingCriteria<T>,
-            existingMatchingDefinition: List<BindingDefinition>) =
-            if (existingMatchingDefinition.isEmpty()) add
-            else getActionForConflict(criteria, existingMatchingDefinition)
-
-    private fun <T> getActionForConflict(
-            criteria: BindingCriteria<T>,
-            existingMatchingDefinition: List<BindingDefinition>) =
-            conflictPolicy.actionFor(criteria.targetType) ?: throw BindingInConflict(criteria, existingMatchingDefinition)
 
     fun onAnyConflict(defaultAction: BindAction) {
         conflictPolicy.defaultPolicyElement = defaultAction.always
@@ -49,16 +56,12 @@ class Module(parentConflictPolicy: ConflictPolicy? = null) {
         conflictPolicy.add(PolicyTypeElement(type) { bindAction })
     }
 
-    private fun <T> add(target: Class<T>, it: ParticleProvider<T>) {
-        bindings.add(Binding(BindingDefinition.Assignable(target), it))
-    }
-
-    fun <T> getBindings(bindingCriteria: BindingCriteria<T>) =
-            bindings.matching(bindingCriteria)
-
-    fun <T> getBindingsInConflict(bindingCriteria: BindingCriteria<T>) =
-            (conflictPolicy.getApplicablePolicyType(bindingCriteria.targetType)
-                    ?.let { bindingCriteria.copy(targetType = it) } ?: bindingCriteria)
-                    .let { bindings.matching(it) }
+    internal fun <T> getBindings(bindingDefinition: BindingDefinition<T>) =
+            bindings.matching(bindingDefinition)
 }
 
+class BindingAlreadyPresent(definition: BindingDefinition<*>, existingDefinitions: List<BindingDefinition<*>>)
+    : Exception("$definition is in conflict with $existingDefinitions and policy is set to fail for it")
+
+class BindingInConflict(definition: BindingDefinition<*>, definitionsInConflict: List<BindingDefinition<*>>)
+    : Exception("$definition is in conflict with $definitionsInConflict, but no policy is present")

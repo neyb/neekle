@@ -4,6 +4,7 @@ import io.github.neyb.shoulk.matcher.match
 import io.github.neyb.shoulk.shouldEqual
 import io.github.neyb.shoulk.shouldThrow
 import io.github.neyb.shoulk.that
+import neekle.BindAction.*
 import org.junit.jupiter.api.Test
 
 class NeekleConflictTest {
@@ -20,7 +21,7 @@ class NeekleConflictTest {
     @Test fun `registering several binding in conflict should fail with fail policy`() {
         {
             Neekle {
-                onAnyConflict(BindAction.fail)
+                onAnyConflict(fail)
                 bind { "instance1" }
                 bind { "instance2" }
             }
@@ -29,7 +30,7 @@ class NeekleConflictTest {
 
     @Test fun `registering several string can be get as collection with add policy`() {
         val injector = Neekle {
-            onAnyConflict(BindAction.add)
+            onAnyConflict(add)
             bind { "instance1" }
             bind { "instance2" }
         }.injector
@@ -41,7 +42,7 @@ class NeekleConflictTest {
 
     @Test fun `registering several string can be get as collection with add policy on type`() {
         val injector = Neekle {
-            onConflictOf<String>(BindAction.add)
+            onConflictOf<String>(add)
             bind { "instance1" }
             bind { "instance2" }
         }.injector
@@ -55,7 +56,7 @@ class NeekleConflictTest {
     @Test fun `registering several charsequence fails with add policy on String`() {
         {
             Neekle {
-                onConflictOf<String>(BindAction.add)
+                onConflictOf<String>(add)
                 bind<CharSequence> { "instance1" }
                 bind<CharSequence> { "instance2" }
             }
@@ -64,20 +65,19 @@ class NeekleConflictTest {
 
     @Test fun `registering several string fails with add policy on charsequence`() {
         val injector = Neekle {
-            onConflictOf<CharSequence>(BindAction.add)
+            onConflictOf<CharSequence>(add)
             bind { "instance1" }
             bind { "instance2" }
         }.injector
 
-        { injector<CharSequence>() } shouldThrow CannotCreateParticle::class that
-                match { it.cause is SeveralParticlesFound }
+        { injector<CharSequence>() } shouldThrow CannotCreateParticle::class that match { it.cause is SeveralParticlesFound }
         injector.getAll<CharSequence>() shouldEqual listOf("instance1", "instance2")
     }
 
     @Test fun `cannot register several subclasses when declared conflict fail`() {
         {
             Neekle {
-                onConflictOf<Any>(BindAction.fail)
+                onConflictOf<Any>(fail)
                 bind { "value" }
                 bind { 3 }
             }
@@ -86,7 +86,7 @@ class NeekleConflictTest {
 
     @Test fun `ignore only keep the first`() {
         val neekle = Neekle {
-            onConflictOf<String>(BindAction.ignore)
+            onConflictOf<String>(ignore)
             bind { "retained" }
             bind { "ignored" }
             bind { "ignored bis" }
@@ -97,12 +97,40 @@ class NeekleConflictTest {
 
     @Test fun `replace only keep the last`() {
         val neekle = Neekle {
-            onConflictOf<String>(BindAction.replace)
+            onConflictOf<String>(replace)
             bind { "ignored" }
             bind { "ignored bis" }
             bind { "retained" }
         }
 
         neekle<String>() shouldEqual "retained"
+    }
+
+    @Test fun `no conflict if names are different`() {
+        val neekle = Neekle {
+            bind("name1") { "value1" }
+            bind("name2") { "value2" }
+        }
+
+        neekle<String>("name1") shouldEqual "value1"
+        neekle<String>("name2") shouldEqual "value2"
+    }
+
+    @Test fun `conflict if first item has no name`() {
+        {
+            Neekle {
+                bind { "value1" }
+                bind("name") { "value2" }
+            }
+        } shouldThrow BindingInConflict::class
+    }
+
+    @Test fun `conflict if second item has no name`() {
+        {
+            Neekle {
+                bind("name") { "value1" }
+                bind { "value2" }
+            }
+        } shouldThrow BindingInConflict::class
     }
 }

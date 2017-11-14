@@ -1,7 +1,5 @@
 package neekle
 
-class Binding<out T>(
-        val definition: BindingDefinition,
-        val provider: ParticleProvider<T>) {
-    fun match(criteria: BindingCriteria<*>): Boolean = definition.match(criteria)
+internal class Binding<out T>(val definition: BindingDefinition<T>, val provider: ParticleProvider<T>) {
+    fun isCandidateFor(definition: BindingDefinition<*>): Boolean = this.definition.isCandidateFor(definition)
 }

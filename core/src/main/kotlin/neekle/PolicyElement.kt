@@ -1,7 +1,7 @@
 package neekle
 
 
-interface PolicyElement {
+internal interface PolicyElement {
 
     companion object {
         operator fun invoke(policyElement: (Class<*>) -> BindAction?) = object : PolicyElement {

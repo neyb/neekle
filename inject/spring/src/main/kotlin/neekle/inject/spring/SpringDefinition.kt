@@ -8,12 +8,14 @@ internal fun <T> String.toSpringDefinition(target:Class<T>) =
         if (!startsWith('@')) ByName(this, target)
         else ByAnnotation(toAnnotation(), target)
 
+@Suppress("UNCHECKED_CAST")
 private fun String.toAnnotation(): Class<Annotation> = (Class.forName(substringAfter('@'))
         .takeIf { Annotation::class.java.isAssignableFrom(it) }
         ?: throw IllegalArgumentException("${substringAfter('@')} is not an annotation"))
         as Class<Annotation>
 
 
+//TODO this need improvement
 internal sealed class SpringDefinition<T>(protected val targetType: Class<T>) {
 
     abstract operator fun get(context: ApplicationContext): Collection<T>

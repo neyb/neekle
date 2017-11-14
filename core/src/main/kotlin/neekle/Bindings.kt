@@ -1,6 +1,6 @@
 package neekle
 
-class Bindings {
+internal class Bindings {
     private val bindings = mutableListOf<Binding<*>>()
 
     fun <T> add(binding: Binding<T>) {
@@ -8,13 +8,16 @@ class Bindings {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> matching(criteria: BindingCriteria<T>) =
-            bindings.filter { it.match(criteria) }
+    fun <T> matching(definition: BindingDefinition<T>) =
+            bindings.filter { it.isCandidateFor(definition) }
                     .map { it as Binding<T> }
 
-    fun <T> replace(criteria: BindingCriteria<T>, binding: Binding<T>) {
-        bindings.removeIf { it.match(criteria) }
+    fun <T> replace(binding: Binding<T>) {
+        bindings.removeIf { it.isCandidateFor(binding.definition) }
         add(binding)
     }
+
+    fun inConflict(definition: BindingDefinition<*>): List<Binding<*>> =
+            bindings.filter { it.isCandidateFor(definition) || definition.isCandidateFor(it.definition) }
 }
 

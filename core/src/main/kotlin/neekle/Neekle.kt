@@ -13,6 +13,6 @@ class Neekle(init: Module.() -> Unit) {
 
     val injector: Injector get() = locator.injector
 
-    inline operator fun <reified T> invoke() = injector<T>()
+    inline operator fun <reified T> invoke(name: String? = null) = injector<T>(name)
 }
 

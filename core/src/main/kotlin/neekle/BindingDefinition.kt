@@ -1,12 +1,10 @@
 package neekle
 
-sealed class BindingDefinition {
-    abstract fun match(criteria: BindingCriteria<*>): Boolean
+data class BindingDefinition<out T>(val type: Class<out T>, val name: String?) {
 
-    class Assignable<in T>(private val registered: Class<T>) : BindingDefinition() {
-        override fun match(criteria: BindingCriteria<*>) = criteria.targetType.isAssignableFrom(registered)
-    }
+    fun isCandidateFor(other: BindingDefinition<*>) =
+            other.type.isAssignableFrom(type) &&
+                    (other.name == null || name == other.name)
 
-
+    override fun toString() = "${type.name}${name?.let { "($it)" }?:""}"
 }
-
