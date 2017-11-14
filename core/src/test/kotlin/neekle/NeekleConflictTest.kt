@@ -1,7 +1,9 @@
 package neekle
 
+import io.github.neyb.shoulk.matcher.match
 import io.github.neyb.shoulk.shouldEqual
 import io.github.neyb.shoulk.shouldThrow
+import io.github.neyb.shoulk.that
 import org.junit.jupiter.api.Test
 
 class NeekleConflictTest {
@@ -9,8 +11,8 @@ class NeekleConflictTest {
     @Test fun `registering several binding in conflict should fail`() {
         {
             Neekle {
-                bind<String>() to Singleton { "instance1" }
-                bind<String>() to Singleton { "instance2" }
+                bind { "instance1" }
+                bind { "instance2" }
             }
         } shouldThrow BindingInConflict::class
     }
@@ -19,8 +21,8 @@ class NeekleConflictTest {
         {
             Neekle {
                 onAnyConflict(BindAction.fail)
-                bind<String>() to Singleton { "instance1" }
-                bind<String>() to Singleton { "instance2" }
+                bind { "instance1" }
+                bind { "instance2" }
             }
         } shouldThrow BindingAlreadyPresent::class
     }
@@ -28,22 +30,25 @@ class NeekleConflictTest {
     @Test fun `registering several string can be get as collection with add policy`() {
         val injector = Neekle {
             onAnyConflict(BindAction.add)
-            bind<String>() to Singleton { "instance1" }
-            bind<String>() to Singleton { "instance2" }
+            bind { "instance1" }
+            bind { "instance2" }
         }.injector
 
-        { injector<String>() } shouldThrow SeveralParticlesFound::class
+        { injector<String>() } shouldThrow CannotCreateParticle::class that
+                match { it.cause is SeveralParticlesFound }
         injector.getAll<String>() shouldEqual listOf("instance1", "instance2")
     }
 
     @Test fun `registering several string can be get as collection with add policy on type`() {
         val injector = Neekle {
             onConflictOf<String>(BindAction.add)
-            bind<String>() to Singleton { "instance1" }
-            bind<String>() to Singleton { "instance2" }
+            bind { "instance1" }
+            bind { "instance2" }
         }.injector
 
-        { injector<String>() } shouldThrow SeveralParticlesFound::class
+        { injector<String>() } shouldThrow CannotCreateParticle::class that
+                match { it.cause is SeveralParticlesFound }
+
         injector.getAll<String>() shouldEqual listOf("instance1", "instance2")
     }
 
@@ -51,8 +56,8 @@ class NeekleConflictTest {
         {
             Neekle {
                 onConflictOf<String>(BindAction.add)
-                bind<CharSequence>() to Singleton { "instance1" }
-                bind<CharSequence>() to Singleton { "instance2" }
+                bind<CharSequence> { "instance1" }
+                bind<CharSequence> { "instance2" }
             }
         } shouldThrow BindingInConflict::class
     }
@@ -60,11 +65,12 @@ class NeekleConflictTest {
     @Test fun `registering several string fails with add policy on charsequence`() {
         val injector = Neekle {
             onConflictOf<CharSequence>(BindAction.add)
-            bind<String>() to Singleton { "instance1" }
-            bind<String>() to Singleton { "instance2" }
+            bind { "instance1" }
+            bind { "instance2" }
         }.injector
 
-        { injector<CharSequence>() } shouldThrow SeveralParticlesFound::class
+        { injector<CharSequence>() } shouldThrow CannotCreateParticle::class that
+                match { it.cause is SeveralParticlesFound }
         injector.getAll<CharSequence>() shouldEqual listOf("instance1", "instance2")
     }
 
@@ -72,8 +78,8 @@ class NeekleConflictTest {
         {
             Neekle {
                 onConflictOf<Any>(BindAction.fail)
-                bind<String>() to Singleton { "value" }
-                bind<Int>() to Singleton { 3 }
+                bind { "value" }
+                bind { 3 }
             }
         } shouldThrow BindingAlreadyPresent::class
     }
@@ -81,9 +87,9 @@ class NeekleConflictTest {
     @Test fun `ignore only keep the first`() {
         val neekle = Neekle {
             onConflictOf<String>(BindAction.ignore)
-            bind<String>() to Singleton { "retained" }
-            bind<String>() to Singleton { "ignored" }
-            bind<String>() to Singleton { "ignored bis" }
+            bind { "retained" }
+            bind { "ignored" }
+            bind { "ignored bis" }
         }
 
         neekle<String>() shouldEqual "retained"
@@ -92,9 +98,9 @@ class NeekleConflictTest {
     @Test fun `replace only keep the last`() {
         val neekle = Neekle {
             onConflictOf<String>(BindAction.replace)
-            bind<String>() to Singleton { "ignored" }
-            bind<String>() to Singleton { "ignored bis" }
-            bind<String>() to Singleton { "retained" }
+            bind { "ignored" }
+            bind { "ignored bis" }
+            bind { "retained" }
         }
 
         neekle<String>() shouldEqual "retained"

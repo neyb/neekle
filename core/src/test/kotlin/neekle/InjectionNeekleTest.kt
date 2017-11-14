@@ -1,6 +1,6 @@
 package neekle
 
-import io.github.neyb.shoulk.hasMessage
+import io.github.neyb.shoulk.matcher.match
 import io.github.neyb.shoulk.shouldThrow
 import io.github.neyb.shoulk.that
 import org.junit.jupiter.api.Test
@@ -13,6 +13,12 @@ class InjectionNeekleTest {
             bind(singleton) { StringWrapper(it) }
         };
 
-        { neekle<StringWrapper>() } shouldThrow NoParticleFound::class that hasMessage("azeaze")
+        { neekle<StringWrapper>() } shouldThrow CannotCreateParticle::class that match {
+            it.criteria == BindingCriteria(StringWrapper::class.java, null) && it.cause.let {
+                it is CannotCreateParticle && it.criteria == BindingCriteria(String::class.java, null) && it.cause.let {
+                    it is NoParticleFound && it.criteria == BindingCriteria(String::class.java, null)
+                }
+            }
+        }
     }
 }

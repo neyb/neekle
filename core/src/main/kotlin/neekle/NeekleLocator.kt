@@ -8,12 +8,16 @@ internal class NeekleLocator(private val module: Module) : Locator {
 
     override fun <T> get(type: Class<T>, definition: String?) =
             BindingCriteria(type, definition).let { criteria ->
-                module.getBindings(criteria).let { bindings ->
-                    when(bindings.size) {
-                        0 -> throw NoParticleFound(criteria)
-                        1 -> bindings.single().provider.get(injector)
-                        else -> throw SeveralParticlesFound(criteria, bindings.map { it.definition })
+                try {
+                    module.getBindings(criteria).let { bindings ->
+                        when (bindings.size) {
+                            0 -> throw NoParticleFound(criteria)
+                            1 -> bindings.single().provider.get(injector)
+                            else -> throw SeveralParticlesFound(criteria, bindings.map { it.definition })
+                        }
                     }
+                } catch (e: Exception) {
+                    throw CannotCreateParticle(criteria, e)
                 }
             }
 
@@ -21,3 +25,4 @@ internal class NeekleLocator(private val module: Module) : Locator {
             module.getBindings(BindingCriteria(type, definition)).map { it.provider.get(injector) }
 }
 
+class CannotCreateParticle(val criteria: BindingCriteria<*>, e: Exception) : Exception("cannot create $criteria", e)

@@ -8,18 +8,23 @@ class Module(parentConflictPolicy: ConflictPolicy? = null) {
     private val bindings = Bindings()
     private val subModules = Modules()
 
-    inline fun <reified T> bind(particleType: ParticleType, name: String? = null, noinline init:(Injector) -> T) {
-        bind(T::class.java, name) to particleType.createProvider(init)
+    inline fun <reified T> bind(particleType: ParticleType = singleton, name: String? = null, noinline init: (Injector) -> T) {
+        bind(T::class.java, name, particleType.createProvider(init))
     }
 
-    inline fun <reified T> bind(name: String? = null): Binder<T> = bind(T::class.java, name)
-
-    fun <T> bind(target: Class<T>, name: String? = null): Binder<T> {
+    fun <T> bind(target: Class<T>, name: String? = null, provider: ParticleProvider<T>) {
         val criteria = BindingCriteria(target, name)
         val existingMatchingDefinition = getBindingsInConflict(criteria).map { it.definition }
 
-        return if (existingMatchingDefinition.isEmpty()) Binder { add(target, it) }
-        else binderForConflict(existingMatchingDefinition, criteria, target)
+        val bindAction: BindAction = if (existingMatchingDefinition.isEmpty()) add
+        else conflictPolicy.actionFor(criteria.targetType) ?: throw BindingInConflict(criteria, existingMatchingDefinition)
+
+        when (bindAction) {
+            ignore -> Unit
+            add -> add(target, provider)
+            replace -> bindings.replace(criteria, Binding(BindingDefinition.Assignable(target), provider))
+            fail -> throw BindingAlreadyPresent(criteria, existingMatchingDefinition)
+        }
     }
 
     fun onAnyConflict(defaultAction: BindAction) {
@@ -32,14 +37,6 @@ class Module(parentConflictPolicy: ConflictPolicy? = null) {
     fun <T> onConflictOf(type: Class<T>, bindAction: BindAction) {
         conflictPolicy.add(PolicyTypeElement(type) { bindAction })
     }
-
-    private fun <T> binderForConflict(matchingDefinition: List<BindingDefinition>, criteria: BindingCriteria<T>, target: Class<T>): Binder<T> =
-            when (conflictPolicy.actionFor(criteria.targetType) ?: throw BindingInConflict(criteria, matchingDefinition)) {
-                ignore -> Binder {}
-                add -> Binder { add(target, it) }
-                replace -> Binder { bindings.replace(criteria, Binding(BindingDefinition.Assignable(target), it)) }
-                fail -> throw BindingAlreadyPresent(criteria, matchingDefinition)
-            }
 
     private fun <T> add(target: Class<T>, it: ParticleProvider<T>) {
         bindings.add(Binding(BindingDefinition.Assignable(target), it))

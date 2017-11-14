@@ -5,7 +5,7 @@ import io.github.neyb.shoulk.shouldEqual
 import org.junit.jupiter.api.Test
 import test.StringWrapper
 
-class SingletonNeekleTest {
+class SingletonProviderNeekleTest {
 
     @Test fun `creating an empty neekle`() {
         Neekle {}
@@ -13,7 +13,7 @@ class SingletonNeekleTest {
 
     @Test fun `register and get singleton`() {
         val neekle = Neekle {
-            bind<String>() to Singleton { "instance" }
+            bind { "instance" }
         }
 
         neekle<String>() shouldEqual "instance"
@@ -21,7 +21,7 @@ class SingletonNeekleTest {
 
     @Test fun `get singleton several times should get same object`() {
         val neekle = Neekle {
-            bind<String>() to Singleton { "instance" }
+            bind { "instance" }
         }
 
         neekle<String>() shouldBe neekle()
@@ -30,8 +30,8 @@ class SingletonNeekleTest {
     @Test fun `singleton can be used in injection`() {
 
         val neekle = Neekle {
-            bind<StringWrapper>() to Singleton { StringWrapper(it) }
-            bind<String>() to "value"
+            bind { StringWrapper(it) }
+            bind { "value" }
         }
 
         neekle<StringWrapper>().value shouldEqual "value"
