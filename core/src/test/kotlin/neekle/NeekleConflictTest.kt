@@ -1,10 +1,9 @@
-package neekle.test
+package neekle
 
 import io.github.neyb.shoulk.matcher.match
 import io.github.neyb.shoulk.shouldEqual
 import io.github.neyb.shoulk.shouldThrow
 import io.github.neyb.shoulk.that
-import neekle.*
 import neekle.BindAction.*
 import org.junit.jupiter.api.Test
 
@@ -36,28 +35,26 @@ class NeekleConflictTest {
             bind { "instance2" }
         }.injector
 
-        { injector<String>() } shouldThrow CannotCreateParticle::class that
-                match { it.cause is SeveralParticlesFound }
+        { injector<String>() } shouldThrow SeveralParticlesFound::class that
+                match { it.message == "several potential particule for =>java.lang.String: [=>java.lang.String, =>java.lang.String]" }
         injector.getAll<String>() shouldEqual listOf("instance1", "instance2")
     }
 
     @Test fun `registering several string can be get as collection with add policy on type`() {
         val injector = Neekle {
-            onConflictOf<String>(add)
+            onConflict<String>(add)
             bind { "instance1" }
             bind { "instance2" }
         }.injector
 
-        { injector<String>() } shouldThrow CannotCreateParticle::class that
-                match { it.cause is SeveralParticlesFound }
-
+        { injector<String>() } shouldThrow SeveralParticlesFound::class
         injector.getAll<String>() shouldEqual listOf("instance1", "instance2")
     }
 
     @Test fun `registering several charsequence fails with add policy on String`() {
         {
             Neekle {
-                onConflictOf<String>(add)
+                onConflict<String>(add)
                 bind<CharSequence> { "instance1" }
                 bind<CharSequence> { "instance2" }
             }
@@ -66,19 +63,20 @@ class NeekleConflictTest {
 
     @Test fun `registering several string fails with add policy on charsequence`() {
         val injector = Neekle {
-            onConflictOf<CharSequence>(add)
+            onConflict<CharSequence>(add)
             bind { "instance1" }
             bind { "instance2" }
         }.injector
 
-        { injector<CharSequence>() } shouldThrow CannotCreateParticle::class that match { it.cause is SeveralParticlesFound }
+        { injector<CharSequence>() } shouldThrow SeveralParticlesFound::class that
+                match { it.message == "several potential particule for =>java.lang.CharSequence: [=>java.lang.String, =>java.lang.String]" }
         injector.getAll<CharSequence>() shouldEqual listOf("instance1", "instance2")
     }
 
     @Test fun `cannot register several subclasses when declared conflict fail`() {
         {
             Neekle {
-                onConflictOf<Any>(fail)
+                onConflict<Any>(fail)
                 bind { "value" }
                 bind { 3 }
             }
@@ -87,7 +85,7 @@ class NeekleConflictTest {
 
     @Test fun `ignore only keep the first`() {
         val neekle = Neekle {
-            onConflictOf<String>(ignore)
+            onConflict<String>(ignore)
             bind { "retained" }
             bind { "ignored" }
             bind { "ignored bis" }
@@ -98,7 +96,7 @@ class NeekleConflictTest {
 
     @Test fun `replace only keep the last`() {
         val neekle = Neekle {
-            onConflictOf<String>(replace)
+            onConflict<String>(replace)
             bind { "ignored" }
             bind { "ignored bis" }
             bind { "retained" }

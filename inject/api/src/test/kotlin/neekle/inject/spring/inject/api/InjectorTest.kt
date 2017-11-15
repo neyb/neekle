@@ -9,9 +9,9 @@ class InjectorTest {
         private val particles = mapOf<Class<*>, Any>(
                 String::class.java to "particle")
 
-        override fun <T> get(type: Class<T>, definition: String?) = particles[type] as T
+        override fun <T> get(type: Class<T>, name: String?) = particles[type] as T
 
-        override fun <T> getAll(type: Class<T>, definition: String?) = listOf(particles[type] as T)
+        override fun <T> getAll(type: Class<T>, name: String?) = listOf(particles[type] as T)
     }
 
     val inject = neekle.inject.api.Injector(TestLocator())

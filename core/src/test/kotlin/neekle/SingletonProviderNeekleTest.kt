@@ -1,8 +1,7 @@
-package neekle.test
+package neekle
 
 import io.github.neyb.shoulk.shouldBe
 import io.github.neyb.shoulk.shouldEqual
-import neekle.Neekle
 import org.junit.jupiter.api.Test
 import test.StringWrapper
 
