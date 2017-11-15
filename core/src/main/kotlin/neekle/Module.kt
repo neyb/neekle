@@ -45,7 +45,7 @@ internal class Module internal constructor(
         conflictPolicy.defaultPolicyElement = defaultAction.always
     }
 
-    override fun <T> onConflictOf(type: Class<T>, bindAction: BindAction) {
+    override fun <T> onConflict(type: Class<T>, bindAction: BindAction) {
         conflictPolicy.add(PolicyTypeElement(type) { bindAction })
     }
 

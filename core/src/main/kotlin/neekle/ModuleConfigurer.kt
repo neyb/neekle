@@ -13,5 +13,5 @@ class ModuleConfigurer internal constructor(module: ConfigurableModule) : Config
             noinline init: (Injector) -> T) =
             bind(T::class.java, name, particleType.createProvider(init))
 
-    inline fun <reified T> onConflict(bindAction: BindAction) = onConflictOf(T::class.java, bindAction)
+    inline fun <reified T> onConflict(bindAction: BindAction) = onConflict(T::class.java, bindAction)
 }

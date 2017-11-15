@@ -11,7 +11,11 @@ internal class ConflictPolicy(private val parent: ConflictPolicy?) {
             watchedTypes += element.applyTo
     }
 
-    fun actionFor(addingType: Class<*>) = selfActionFor(addingType) ?: parent?.selfActionFor(addingType)
+    fun actionFor(addingType: Class<*>) =
+            ActionForNoDefault(addingType)?: defaultActionFor(addingType)
+
+    private fun ActionForNoDefault(addingType: Class<*>) = (selfActionForNoDefault(addingType)
+            ?: parent?.selfActionForNoDefault(addingType))
 
     fun getApplicablePolicyType(targetType: Class<*>): Class<*>? =
             watchedTypes.filter { it.isAssignableFrom(targetType) }
@@ -23,8 +27,12 @@ internal class ConflictPolicy(private val parent: ConflictPolicy?) {
                         }
                     }
 
-    private fun selfActionFor(addingType: Class<*>): BindAction? =
-            elements.firstAction(addingType) ?: defaultPolicyElement?.actionFor(addingType)
+    private fun selfActionForNoDefault(addingType: Class<*>): BindAction? = elements.firstAction(addingType)
+
+    private fun defaultActionFor(addingType: Class<*>) = selfDefaultActionFor(addingType)
+            ?: parent?.selfDefaultActionFor(addingType)
+
+    private fun selfDefaultActionFor(addingType: Class<*>) = defaultPolicyElement?.actionFor(addingType)
 
     private fun List<PolicyElement>.firstAction(addingType: Class<*>) = asSequence()
             .mapNotNull { it.actionFor(addingType) }
