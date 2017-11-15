@@ -12,7 +12,7 @@ class UsingDefaultConfigurationTest {
         val neekle = Neekle {
             bind { A("my A", it) }
             bind { C("my C") }
-            submodule(DefaultConfiguration)
+            submodule(defaultConfiguration)
         }
 
         val a = neekle<A>()
@@ -34,14 +34,10 @@ class B(val name: String, injector: Injector) {
 
 class C(val name: String)
 
-object DefaultConfiguration : (ModuleConfigurer) -> Unit {
-    override fun invoke(configurer: ModuleConfigurer) {
-        configurer.apply {
-            onAnyConflict(BindAction.ignore)
+val defaultConfiguration: ModuleConfigurer.() -> Unit = {
+    onAnyConflict(BindAction.ignore)
 
-            bind { A("default A", it) }
-            bind { B("default B", it) }
-            bind { C("default C") }
-        }
-    }
+    bind { A("default A", it) }
+    bind { B("default B", it) }
+    bind { C("default C") }
 }
