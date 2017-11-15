@@ -2,9 +2,12 @@ package neekle
 
 import neekle.BindAction.*
 
-internal class Module internal constructor(parentConflictPolicy: ConflictPolicy? = null) : ConfigurableModule, BindingsFinder {
+internal class Module internal constructor(
+        parentConflictPolicy: ConflictPolicy? = null,
+        private val bindings: Bindings = Bindings()
+                                          ) : ConfigurableModule, BindingsFinder {
     private val conflictPolicy = ConflictPolicy(parentConflictPolicy)
-    private val bindings = Bindings()
+
     private val subModules = Modules()
 
     override fun <T> bind(target: Class<T>, name: String?, provider: ParticleProvider<T>) {
@@ -47,15 +50,18 @@ internal class Module internal constructor(parentConflictPolicy: ConflictPolicy?
     }
 
     override fun submodule(init: ModuleConfigurer.() -> Unit) {
-        subModules.add(Module(conflictPolicy).also { ModuleConfigurer(it).apply(init) })
+        subModules.add(Module(conflictPolicy, bindings).also { ModuleConfigurer(it).apply(init) })
     }
 
-    override fun <T> getBindings(definition: BindingDefinition<T>) =
-            bindings.matching(definition) + subModules.matching(definition)
+    override fun <T> getBindings(definition: BindingDefinition<T>) = bindings.matching(definition)
 }
 
-class BindingAlreadyPresent internal constructor(definition: BindingDefinition<*>, existingDefinitions: List<BindingDefinition<*>>)
+class BindingAlreadyPresent internal constructor(
+        definition: BindingDefinition<*>,
+        existingDefinitions: List<BindingDefinition<*>>)
     : Exception("$definition is in conflict with $existingDefinitions and policy is set to fail for it")
 
-class BindingInConflict internal constructor(definition: BindingDefinition<*>, definitionsInConflict: List<BindingDefinition<*>>)
+class BindingInConflict internal constructor(
+        definition: BindingDefinition<*>,
+        definitionsInConflict: List<BindingDefinition<*>>)
     : Exception("$definition is in conflict with $definitionsInConflict, but no policy is present")

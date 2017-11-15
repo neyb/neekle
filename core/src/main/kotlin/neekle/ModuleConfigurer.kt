@@ -3,6 +3,7 @@ package neekle
 import neekle.inject.api.Injector
 
 
+@Suppress("MemberVisibilityCanPrivate")
 class ModuleConfigurer internal constructor(module: ConfigurableModule) : ConfigurableModule by module {
     val singleton: ParticleType = Singleton
 
