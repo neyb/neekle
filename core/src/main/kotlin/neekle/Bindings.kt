@@ -7,10 +7,7 @@ internal class Bindings {
         bindings.add(binding)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T> matching(definition: BindingDefinition<T>) =
-            bindings.filter { it.isCandidateFor(definition) }
-                    .map { it as Binding<T> }
+    fun <T> matching(definition: BindingDefinition<T>) = bindings.mapNotNull { it.asCandidateForOrNull(definition) }
 
     fun <T> replace(binding: Binding<T>) {
         bindings.removeIf { it.isCandidateFor(binding.definition) }

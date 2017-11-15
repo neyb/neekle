@@ -2,10 +2,8 @@ package neekle
 
 import neekle.inject.api.Injector
 
-val Module.singleton: ParticleType get() = Singleton
-
-private object Singleton : ParticleType {
-    override fun <T> createProvider(init: (Injector) -> T) = SingletonProvider(init)
+internal object Singleton : ParticleType {
+    override fun <T> createProvider(init: (Injector) -> T): ParticleProvider<T> = SingletonProvider(init)
 }
 
 //TODO not threadsafe

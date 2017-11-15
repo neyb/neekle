@@ -1,6 +1,7 @@
-package neekle
+package neekle.test
 
 import io.github.neyb.shoulk.shouldEqual
+import neekle.Neekle
 import org.junit.jupiter.api.Test
 
 class SubclassNeekleTest {

@@ -2,11 +2,11 @@ package neekle
 
 import neekle.inject.api.Injector
 
-class Neekle(init: Module.() -> Unit) {
+class Neekle(init: ModuleConfigurer.() -> Unit) {
     private val module = Module()
 
     init {
-        module.init()
+        module.let { ModuleConfigurer(it).apply(init) }
     }
 
     private val locator = NeekleLocator(module)

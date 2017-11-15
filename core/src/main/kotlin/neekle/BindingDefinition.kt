@@ -1,6 +1,6 @@
 package neekle
 
-data class BindingDefinition<out T>(val type: Class<out T>, val name: String?) {
+internal data class BindingDefinition<out T>(val type: Class<out T>, val name: String?) {
 
     fun isCandidateFor(other: BindingDefinition<*>) =
             other.type.isAssignableFrom(type) &&

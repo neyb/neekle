@@ -1,6 +1,6 @@
 package neekle.inject.api
 
-class Injector (private val locator: neekle.inject.api.Locator) {
+class Injector (private val locator: Locator) {
     operator inline fun <reified T> invoke(definition: String? = null) = get(T::class.java, definition)
     inline fun <reified T> getAll(definition: String? = null) = getAll(T::class.java, definition)
 

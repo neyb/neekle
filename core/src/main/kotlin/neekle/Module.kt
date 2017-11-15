@@ -1,20 +1,13 @@
 package neekle
 
 import neekle.BindAction.*
-import neekle.inject.api.Injector
 
-class Module internal constructor(parentConflictPolicy: ConflictPolicy? = null) {
+internal class Module internal constructor(parentConflictPolicy: ConflictPolicy? = null) : ConfigurableModule, BindingsFinder {
     private val conflictPolicy = ConflictPolicy(parentConflictPolicy)
     private val bindings = Bindings()
     private val subModules = Modules()
 
-    inline fun <reified T> bind(
-            name: String? = null,
-            particleType: ParticleType = singleton,
-            noinline init: (Injector) -> T) =
-        bind(T::class.java, name, particleType.createProvider(init))
-
-    fun <T> bind(target: Class<T>, name: String? = null, provider: ParticleProvider<T>) {
+    override fun <T> bind(target: Class<T>, name: String?, provider: ParticleProvider<T>) {
         fun getConflictDefinitionOrNull(bindingDefinition: BindingDefinition<*>) =
                 conflictPolicy.getApplicablePolicyType(bindingDefinition.type)
                         ?.let { bindingDefinition.copy(type = it) }
@@ -45,23 +38,24 @@ class Module internal constructor(parentConflictPolicy: ConflictPolicy? = null) 
         }
     }
 
-    fun onAnyConflict(defaultAction: BindAction) {
+    override fun onAnyConflict(defaultAction: BindAction) {
         conflictPolicy.defaultPolicyElement = defaultAction.always
     }
 
-    inline fun <reified T> onConflictOf(bindAction: BindAction) =
-            onConflictOf(T::class.java, bindAction)
-
-    fun <T> onConflictOf(type: Class<T>, bindAction: BindAction) {
+    override fun <T> onConflictOf(type: Class<T>, bindAction: BindAction) {
         conflictPolicy.add(PolicyTypeElement(type) { bindAction })
     }
 
-    internal fun <T> getBindings(bindingDefinition: BindingDefinition<T>) =
-            bindings.matching(bindingDefinition)
+    override fun submodule(init: ModuleConfigurer.() -> Unit) {
+        subModules.add(Module(conflictPolicy).also { ModuleConfigurer(it).apply(init) })
+    }
+
+    override fun <T> getBindings(definition: BindingDefinition<T>) =
+            bindings.matching(definition) + subModules.matching(definition)
 }
 
-class BindingAlreadyPresent(definition: BindingDefinition<*>, existingDefinitions: List<BindingDefinition<*>>)
+class BindingAlreadyPresent internal constructor(definition: BindingDefinition<*>, existingDefinitions: List<BindingDefinition<*>>)
     : Exception("$definition is in conflict with $existingDefinitions and policy is set to fail for it")
 
-class BindingInConflict(definition: BindingDefinition<*>, definitionsInConflict: List<BindingDefinition<*>>)
+class BindingInConflict internal constructor(definition: BindingDefinition<*>, definitionsInConflict: List<BindingDefinition<*>>)
     : Exception("$definition is in conflict with $definitionsInConflict, but no policy is present")
