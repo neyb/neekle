@@ -11,35 +11,35 @@ internal class Module internal constructor(
     private val subModules = Modules()
 
     override fun <T> bind(target: Class<T>, name: String?, provider: ParticleProvider<T>) {
-        fun getConflictDefinitionOrNull(bindingDefinition: BindingDefinition<*>) =
-                conflictPolicy.getApplicablePolicyType(bindingDefinition.type)
-                        ?.let { bindingDefinition.copy(type = it) }
-
-        fun getBindingsInConflict(bindingDefinition: BindingDefinition<*>) =
-                (getConflictDefinitionOrNull(bindingDefinition) ?: bindingDefinition)
-                        .let { bindings.inConflict(it) }
-
-        fun <T> getActionForConflict(
-                definition: BindingDefinition<T>,
-                existingMatchingSpecification: List<BindingDefinition<*>>) =
-                conflictPolicy.actionFor(definition.type) ?: throw BindingInConflict(definition, existingMatchingSpecification)
-
-        fun <T> actionFor(
-                definition: BindingDefinition<T>,
-                existingMatchingDefinition: List<BindingDefinition<*>>) =
-                if (existingMatchingDefinition.isEmpty()) add
-                else getActionForConflict(definition, existingMatchingDefinition)
-
         val definition = BindingDefinition(target, name)
-        val existingMatchingDefinition = getBindingsInConflict(definition).map { it.definition }
+        val definitionsInConflict = getBindingsInConflict(definition).map { it.definition }
 
-        when (actionFor(definition, existingMatchingDefinition)) {
+        when (actionFor(definition, definitionsInConflict)) {
             ignore -> Unit
             add -> bindings.add(Binding(definition, provider))
             replace -> bindings.replace(Binding(definition, provider))
-            fail -> throw BindingAlreadyPresent(definition, existingMatchingDefinition)
+            fail -> throw BindingAlreadyPresent(definition, definitionsInConflict)
         }
     }
+
+    private fun getConflictDefinitionOrNull(bindingDefinition: BindingDefinition<*>) =
+            conflictPolicy.getApplicablePolicyType(bindingDefinition.type)
+                    ?.let { bindingDefinition.copy(type = it) }
+
+    private fun getBindingsInConflict(bindingDefinition: BindingDefinition<*>) =
+            (getConflictDefinitionOrNull(bindingDefinition) ?: bindingDefinition)
+                    .let { bindings.inConflict(it) }
+
+    private fun <T> getActionForConflict(
+            definition: BindingDefinition<T>,
+            existingMatchingSpecification: List<BindingDefinition<*>>) =
+            conflictPolicy.actionFor(definition.type) ?: throw BindingInConflict(definition, existingMatchingSpecification)
+
+    private fun <T> actionFor(
+            definition: BindingDefinition<T>,
+            existingMatchingDefinition: List<BindingDefinition<*>>) =
+            if (existingMatchingDefinition.isEmpty()) add
+            else getActionForConflict(definition, existingMatchingDefinition)
 
     override fun onAnyConflict(defaultAction: BindAction) {
         conflictPolicy.defaultPolicyElement = defaultAction.always
