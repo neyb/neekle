@@ -35,7 +35,7 @@ no classpath scanning, no reflection, no file parsing : just compiled code
 
 # How to use
 
-## install
+## Install
 
 for now neekle is not published anywhere... So the simplest way is probably something that looks like that:
 ```
@@ -48,13 +48,13 @@ for now neekle is not published anywhere... So the simplest way is probably some
         ..
 ```
 
-## creating your first neekle
+## Creating your first neekle
 
 ```kotlin
 val neekle = Neekle {}
 ```
 
-## adding components and getting one
+## Adding components and getting one
 
 considering A: `class A(injector:Injector) { val b = Injector<B>() }`,  
 B: `class B(injector:Injector) { val c = Injector<C>() }`,  
@@ -74,6 +74,6 @@ you can then get you main component (A) with `neekle.<A>()`
 
 ## Conflict management
 
-## subModules
+## SubModules
 
-## defaultModules
+## DefaultModules
