@@ -1,14 +1,10 @@
 package neekle
 
 import neekle.inject.api.Injector
+import neekle.ModuleConfigurer.Companion.configure
 
-class Neekle(init: ModuleConfigurer.() -> Unit) {
-    private val module = Module()
-
-    init {
-        module.let { ModuleConfigurer(it).apply(init) }
-    }
-
+class Neekle(configuration: Configuration) {
+    private val module = configuration.configure()
     private val locator = NeekleLocator(module)
 
     val injector: Injector get() = locator.injector

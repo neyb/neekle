@@ -1,6 +1,7 @@
 package neekle
 
 import neekle.BindAction.*
+import neekle.ModuleConfigurer.Companion.configure
 
 internal class Module internal constructor(
         parentConflictPolicy: ConflictPolicy? = null,
@@ -49,8 +50,8 @@ internal class Module internal constructor(
         conflictPolicy.add(PolicyTypeElement(type) { bindAction })
     }
 
-    override fun submodule(init: ModuleConfigurer.() -> Unit) {
-        subModules.add(Module(conflictPolicy, bindings).also { ModuleConfigurer(it).apply(init) })
+    override fun submodule(configuration: Configuration) {
+        subModules.add(configuration.configure(Module(conflictPolicy, bindings)))
     }
 
     override fun <T> getBindings(definition: BindingDefinition<T>) = bindings.matching(definition)
