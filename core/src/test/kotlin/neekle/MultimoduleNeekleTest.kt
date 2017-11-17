@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 
 class MultimoduleNeekleTest {
 
-    @Test fun `binding a particle in a submodule get be used`() {
+    @Test fun `binding a component in a submodule get be used`() {
         val neekle = Neekle {
             submodule {
                 bind { "value" }

@@ -35,8 +35,8 @@ class NeekleConflictTest {
             bind { "instance2" }
         }.injector
 
-        { injector<String>() } shouldThrow SeveralParticlesFound::class that
-                match { it.message == "several potential particule for =>java.lang.String: [=>java.lang.String, =>java.lang.String]" }
+        { injector<String>() } shouldThrow SeveralBindingsFound::class that
+                match { it.message == "several potential bindings for =>java.lang.String: [=>java.lang.String, =>java.lang.String]" }
         injector.getAll<String>() shouldEqual listOf("instance1", "instance2")
     }
 
@@ -47,7 +47,7 @@ class NeekleConflictTest {
             bind { "instance2" }
         }.injector
 
-        { injector<String>() } shouldThrow SeveralParticlesFound::class
+        { injector<String>() } shouldThrow SeveralBindingsFound::class
         injector.getAll<String>() shouldEqual listOf("instance1", "instance2")
     }
 
@@ -68,8 +68,8 @@ class NeekleConflictTest {
             bind { "instance2" }
         }.injector
 
-        { injector<CharSequence>() } shouldThrow SeveralParticlesFound::class that
-                match { it.message == "several potential particule for =>java.lang.CharSequence: [=>java.lang.String, =>java.lang.String]" }
+        { injector<CharSequence>() } shouldThrow SeveralBindingsFound::class that
+                match { it.message == "several potential bindings for =>java.lang.CharSequence: [=>java.lang.String, =>java.lang.String]" }
         injector.getAll<CharSequence>() shouldEqual listOf("instance1", "instance2")
     }
 

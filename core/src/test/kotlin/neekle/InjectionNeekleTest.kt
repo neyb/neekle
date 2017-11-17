@@ -11,14 +11,14 @@ import test.withCauses
 
 class InjectionNeekleTest {
 
-    @Test fun `create a particle without a dependency fails`() {
+    @Test fun `create a component without a dependency fails`() {
         val neekle = Neekle {
             bind { StringWrapper(it) }
         }
 
-        ({ neekle<StringWrapper>() } shouldThrow CannotCreateParticle::class).withCauses() shouldMatchInOrder listOf(
-                match { it is CannotCreateParticle && it.message == "cannot create =>test.StringWrapper" },
-                match { it is NoParticleFound && it.message == "no particle found for =>java.lang.String"})
+        ({ neekle<StringWrapper>() } shouldThrow CannotCreateComponent::class).withCauses() shouldMatchInOrder listOf(
+                match { it is CannotCreateComponent && it.message == "cannot create =>test.StringWrapper" },
+                match { it is NoBindingFound && it.message == "no binding found for =>java.lang.String"})
     }
 
     @Test

@@ -11,7 +11,7 @@ internal class Module internal constructor(
 
     private val subModules = Modules()
 
-    override fun <T> bind(target: Class<T>, name: String?, provider: ParticleProvider<T>) {
+    override fun <T> bind(target: Class<T>, name: String?, provider: ComponentProvider<T>) {
         val definition = BindingDefinition(target, name)
         val definitionsInConflict = getBindingsInConflict(definition).map { it.definition }
 

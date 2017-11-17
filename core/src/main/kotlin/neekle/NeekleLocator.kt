@@ -9,9 +9,9 @@ internal class NeekleLocator(private val bindingsFinder: BindingsFinder) : Locat
     override fun <T> get(type: Class<T>, name: String?) = BindingDefinition(type, name).let { definition ->
         bindingsFinder.getBindings(definition).let { bindings ->
             when (bindings.size) {
-                0 -> throw NoParticleFound(definition)
+                0 -> throw NoBindingFound(definition)
                 1 -> bindings.single().provider.handledGet(definition)
-                else -> throw SeveralParticlesFound(definition, bindings.map { it.definition })
+                else -> throw SeveralBindingsFound(definition, bindings.map { it.definition })
             }
         }
     }
@@ -20,28 +20,28 @@ internal class NeekleLocator(private val bindingsFinder: BindingsFinder) : Locat
         try {
             bindingsFinder.getBindings(definition).map { it.provider.handledGet(definition) }
         } catch (e: Exception) {
-            throw CannotCreateParticles(definition, e)
+            throw CannotCreateComponents(definition, e)
         }
     }
 
-    private fun <T> ParticleProvider<T>.handledGet(definition: BindingDefinition<T>): T =
+    private fun <T> ComponentProvider<T>.handledGet(definition: BindingDefinition<T>): T =
             try {
                 get(injector)
             } catch (e: Exception) {
-                throw CannotCreateParticle(definition, e)
+                throw CannotCreateComponent(definition, e)
             }
 }
 
-class CannotCreateParticle internal constructor(definition: BindingDefinition<*>, e: Exception)
+class CannotCreateComponent internal constructor(definition: BindingDefinition<*>, e: Exception)
     : Exception("cannot create $definition", e)
 
-class CannotCreateParticles internal constructor(definition: BindingDefinition<*>, e: Exception)
+class CannotCreateComponents internal constructor(definition: BindingDefinition<*>, e: Exception)
     : Exception("cannot create several $definition", e)
 
-class NoParticleFound internal constructor(definition: BindingDefinition<*>)
-    : Exception("no particle found for $definition")
+class NoBindingFound internal constructor(definition: BindingDefinition<*>)
+    : Exception("no binding found for $definition")
 
-class SeveralParticlesFound internal constructor(
+class SeveralBindingsFound internal constructor(
         definition: BindingDefinition<*>,
         existingMatchingDefinitions: List<BindingDefinition<*>>)
-    : Exception("several potential particule for $definition: $existingMatchingDefinitions")
+    : Exception("several potential bindings for $definition: $existingMatchingDefinitions")

@@ -12,7 +12,7 @@ class ModuleConfigurer private constructor(module: ConfigurableModule) : Configu
         }
     }
 
-    val singleton: ParticleType = Singleton
+    val singleton: BindingType = Singleton
     private val delayed = mutableListOf<Configuration>()
 
     fun defaultModule(configuration: Configuration) {
@@ -21,9 +21,9 @@ class ModuleConfigurer private constructor(module: ConfigurableModule) : Configu
 
     inline fun <reified T> bind(
             name: String? = null,
-            particleType: ParticleType = singleton,
+            bindingType: BindingType = singleton,
             noinline init: (Injector) -> T) =
-            bind(T::class.java, name, particleType.createProvider(init))
+            bind(T::class.java, name, bindingType.createProvider(init))
 
     inline fun <reified T> onConflict(bindAction: BindAction) = onConflict(T::class.java, bindAction)
 
