@@ -14,13 +14,16 @@ interface MyComponent
 
 annotation class MyAnnotation
 
-@Component class MyComponentA(inject: Injector) {
-    val componentB: MyComponentB = inject()
-    val myComponents: Collection<neekle.inject.spring.MyComponent> = inject.getAll()
-    val annotatedComponent: Collection<neekle.inject.spring.MyComponent> = inject.getAll("@neekle.inject.spring.MyAnnotation")
+@Component
+class MyComponentA(inject: Injector) {
+    val componentB = inject<MyComponentB>()
+    val myComponents = inject.getAll<MyComponent>()
+    val annotatedComponents = inject.getAll<MyComponent>("@neekle.inject.spring.MyAnnotation")
 }
 
-@Component class MyComponentB : neekle.inject.spring.MyComponent
+@Component
+class MyComponentB : MyComponent
 
 @MyAnnotation
-@Component class MyComponentC : neekle.inject.spring.MyComponent
+@Component
+class MyComponentC : MyComponent
