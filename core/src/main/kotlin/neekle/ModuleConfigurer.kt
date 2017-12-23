@@ -13,6 +13,7 @@ class ModuleConfigurer private constructor(module: ConfigurableModule) : Configu
     }
 
     val singleton: BindingType = Singleton
+    val prototype: BindingType = Prototype
     private val delayed = mutableListOf<Configuration>()
 
     fun defaultModule(configuration: Configuration) {

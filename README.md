@@ -82,8 +82,8 @@ you can then get you main component (A) with `neekle.<A>()`
 
 # TODOs
 
-- force policy
 - prototype
+- force policy
 - readme & doc
 - test mock
 - creation interceptor / provider decorator
