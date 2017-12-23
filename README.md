@@ -72,8 +72,19 @@ val neekle = Neekle {
 
 you can then get you main component (A) with `neekle.<A>()`
 
+## binding type
+
 ## Conflict management
 
 ## SubModules
 
 ## DefaultModules
+
+# TODOs
+
+- force policy
+- prototype
+- readme & doc
+- test mock
+- creation interceptor / provider decorator
+- publish
