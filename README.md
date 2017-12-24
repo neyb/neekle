@@ -70,7 +70,7 @@ val neekle = Neekle {
 }
 ```
 
-you can then get you main component (A) with `neekle.<A>()`
+you can then get you main component (A) with `neekle<A>()`
 
 ## binding type
 
@@ -82,9 +82,16 @@ you can then get you main component (A) with `neekle.<A>()`
 
 # TODOs
 
-- prototype
-- force policy
-- readme & doc
+## to impl
+
 - test mock
 - creation interceptor / provider decorator
 - publish
+- yaml conf
+
+## to document
+
+- prototype
+- force policy
+- `easy import` strategy
+- readme & doc

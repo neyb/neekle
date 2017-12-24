@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':neekle-test')
+    compile 'org.mockito:mockito-core:2.13.0'
+    compile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+}
