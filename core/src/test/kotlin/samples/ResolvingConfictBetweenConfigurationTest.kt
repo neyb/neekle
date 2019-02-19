@@ -56,32 +56,34 @@ class ResolvingConfictBetweenConfigurationTest {
         }<String>() shouldEqual "value1"
     }
 
-    @Test fun `a conflict can exist within two default configuration with default action (bis)`() {
-        {
+    @Test
+    fun `a conflict can exist within two default configuration with default action (bis)`() {
+        val function: () -> Unit = {
             Neekle {
                 defaultModule {
-                    onAnyConflict(BindAction.fail)
-                    submodule(defaultConfiguration1)
+                    submodule { bind { "value1" } }
                 }
 
                 defaultModule {
                     onAnyConflict(BindAction.fail)
-                    submodule(defaultConfiguration2)
+                    submodule { bind { "value2" } }
                 }
             }
-        } shouldThrow BindingAlreadyPresent::class
+        }
+
+        function shouldThrow BindingAlreadyPresent::class
     }
 
     @Test fun `resolving a conflict between two default configuration with default action (bis)`() {
         Neekle {
             defaultModule {
                 onAnyConflict(BindAction.fail)
-                submodule(defaultConfiguration1)
+                submodule { bind { "value1" } }
             }
 
             defaultModule {
                 onAnyConflict(BindAction.fail)
-                submodule(defaultConfiguration2)
+                submodule { bind { "value2" } }
             }
 
             onConflict<String>(BindAction.ignore)
