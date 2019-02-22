@@ -2,8 +2,10 @@
 /gradle
 /gradlew*
 /.gradle
-createProvider
+
+# build outputs
 out
+build
 
 #idea
 .idea

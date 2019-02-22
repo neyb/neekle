@@ -1,15 +1,15 @@
 group 'io.neyb.neekle'
 version '0.0.0-SNAPSHOT'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.4.1'
+wrapper {
+    gradleVersion = '5.2.1'
 }
 
 buildscript {
     ext {
         kotlinVersion = '1.3.21'
-        junitVersion = '5.0.1'
-        junit5Version = '1.0.1'
+        junitVersion = '5.4.0'
+        junit5Version = '1.4.0'
     }
 
     repositories {
@@ -19,7 +19,6 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "org.junit.platform:junit-platform-gradle-plugin:$junit5Version"
     }
 }
 
@@ -37,7 +36,10 @@ subprojects {
     }
 
     apply plugin: 'kotlin'
-    apply plugin: 'org.junit.platform.gradle.plugin'
+    
+    test {
+        useJUnitPlatform()
+    }
 
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
