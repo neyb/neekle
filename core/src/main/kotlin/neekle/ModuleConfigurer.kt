@@ -26,8 +26,6 @@ class ModuleConfigurer private constructor(module: ConfigurableModule) : Configu
             noinline init: (Injector) -> T) =
             bind(T::class.java, name, bindingType.createProvider(init))
 
-    inline fun <reified T> onConflict(bindAction: BindAction) = onConflict(T::class.java, bindAction)
-
     private fun configure(configuration: Configuration) {
         this.configuration()
         runDelayed()
