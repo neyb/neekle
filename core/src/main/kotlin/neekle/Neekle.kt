@@ -5,7 +5,7 @@ import neekle.ModuleConfigurer.Companion.configure
 
 class Neekle(configuration: Configuration) {
     private val module = configuration.configure()
-    private val locator = NeekleLocator(module)
+    private val locator = ModuleLocator(module)
 
     val injector: Injector get() = locator.injector
 

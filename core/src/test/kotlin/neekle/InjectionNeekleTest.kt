@@ -2,12 +2,10 @@ package neekle
 
 import io.github.neyb.shoulk.matcher.match
 import io.github.neyb.shoulk.shouldBe
-import io.github.neyb.shoulk.shouldMatchInOrder
 import io.github.neyb.shoulk.shouldThrow
 import org.junit.jupiter.api.Test
 import test.NullableStringWrapper
 import test.StringWrapper
-import test.withCauses
 
 class InjectionNeekleTest {
 
@@ -16,7 +14,7 @@ class InjectionNeekleTest {
             bind { StringWrapper(it) }
         }
 
-        ({ neekle<StringWrapper>() } shouldThrow CannotCreateComponent::class).withCauses() shouldMatchInOrder listOf(
+        ({ neekle<StringWrapper>() } shouldThrow neekle.locators.CannotCreateComponent::class).withCauses() shouldMatchInOrder listOf(
                 match { it is CannotCreateComponent && it.message == "cannot create =>test.StringWrapper" },
                 match { it is NoBindingFound && it.message == "no binding found for =>java.lang.String"})
     }

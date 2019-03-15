@@ -1,7 +1,6 @@
 package samples
 
 import io.github.neyb.shoulk.shouldEqual
-import neekle.BindAction
 import neekle.Configuration
 import neekle.Neekle
 import neekle.inject.api.Injector

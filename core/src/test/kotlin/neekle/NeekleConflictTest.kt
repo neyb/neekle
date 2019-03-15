@@ -1,10 +1,6 @@
 package neekle
 
-import io.github.neyb.shoulk.matcher.match
 import io.github.neyb.shoulk.shouldEqual
-import io.github.neyb.shoulk.shouldThrow
-import io.github.neyb.shoulk.that
-import neekle.BindAction.*
 import org.junit.jupiter.api.Test
 
 class NeekleConflictTest {
