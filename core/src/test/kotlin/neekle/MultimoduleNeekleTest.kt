@@ -1,8 +1,6 @@
 package neekle
 
 import io.github.neyb.shoulk.shouldEqual
-import io.github.neyb.shoulk.shouldThrow
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class MultimoduleNeekleTest {

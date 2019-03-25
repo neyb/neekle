@@ -1,6 +1,6 @@
 package test
 
-import neekle.inject.api.Injector
+import neekle.Injector
 
 class NullableStringWrapper(injector: Injector){
     val value:String? = injector()

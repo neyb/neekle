@@ -21,7 +21,7 @@ We consider that neekle is a libray, not a framework.
 
 ## Let you free & testability
 
-The `neekle-inject-api` is a simple module (1 class and 1 interface) that let you use any other DI if you want
+The `neekle-inject-api` is a simple neekleModule (1 class and 1 interface) that let you use any other DI if you want
 by reimplement the `Locator` interface.
 
 we provide an [example](inject/spring/src/test/kotlin/neekle/inject/spring/SpringLocatorTest.kt) that show using spring context instead of `neekle-core` without changing
@@ -85,7 +85,7 @@ you can then get you main component (A) with `neekle<A>()`
 ## to impl
 
 - test mock
-- creation interceptor / provider decorator
+- creation interceptor / initializer decorator
 - publish
 - yaml conf
 

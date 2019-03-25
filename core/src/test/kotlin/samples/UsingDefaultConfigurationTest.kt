@@ -2,8 +2,8 @@ package samples
 
 import io.github.neyb.shoulk.shouldEqual
 import neekle.Configuration
+import neekle.Injector
 import neekle.Neekle
-import neekle.inject.api.Injector
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 

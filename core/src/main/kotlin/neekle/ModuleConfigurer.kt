@@ -1,13 +1,11 @@
 package neekle
 
-import neekle.inject.api.Injector
-
 typealias Configuration = ModuleConfigurer.() -> Unit
 
 class ModuleConfigurer private constructor(module: ConfigurableModule) : ConfigurableModule by module {
 
     internal companion object {
-        internal fun Configuration.configure(module: Module = Module()) = module.also {
+        internal fun Configuration.configure(neekleModule: NeekleModule) = neekleModule.also {
             ModuleConfigurer(it).configure(this)
         }
     }

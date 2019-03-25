@@ -1,7 +1,6 @@
 package neekle
 
 import io.github.neyb.shoulk.shouldEqual
-import neekle.inject.api.Injector
 import org.junit.jupiter.api.Test
 
 class LazyNeekleTest {

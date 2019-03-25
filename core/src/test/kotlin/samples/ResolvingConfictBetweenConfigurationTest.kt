@@ -1,9 +1,6 @@
 package samples
 
-import io.github.neyb.shoulk.shouldEqual
-import io.github.neyb.shoulk.shouldThrow
-import neekle.*
-import org.junit.jupiter.api.Test
+import neekle.Configuration
 
 @Suppress("MemberVisibilityCanPrivate")
 class ResolvingConfictBetweenConfigurationTest {

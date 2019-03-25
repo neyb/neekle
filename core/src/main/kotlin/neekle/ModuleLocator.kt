@@ -1,29 +1,27 @@
 package neekle
 
-import neekle.inject.api.Injector
 import neekle.inject.api.Locator
 
-internal class ModuleLocator(private val bindingsFinder: BindingsFinder) : Locator {
-    val injector = Injector(this)
+internal class ModuleLocator(private val module: Module) : Locator {
 
-    override fun <T> get(type: Class<T>, name: String?) = BindingDefinition(type, name).let { definition ->
-        bindingsFinder.getBinding(definition).provider.handledGet(definition)
-    }
+    //FIXME if only 1 component is asked and several component match,
+    // all compoents of same type will be created before the error is thrown...
+    // implement me to solve this
+    //    override fun <T> Locator.get(type: Class<T>, name: String?): T {
+    //        TODO("not implemented")
+    //    }
 
-    override fun <T> getAll(type: Class<T>, name: String?) = BindingDefinition(type, name).let { definition ->
-        bindingsFinder.getBindings(definition).map { it.provider.handledGet(definition) }
-    }
-
-    private fun <T> ComponentProvider<T>.handledGet(definition: BindingDefinition<T>): T =
-            try {
-                get(injector)
-            } catch (e: Exception) {
-                throw CannotCreateComponent(definition, e)
+    override fun <T> getAll(type: Class<T>, name: String?): Collection<T> =
+            BindingDefinition(type, name).let { definition ->
+                module.getProviders(definition).map {
+                    try {
+                        it.getComponent()
+                    } catch (e: Exception) {
+                        throw CannotCreateComponent(definition, e)
+                    }
+                }
             }
 }
 
 class CannotCreateComponent internal constructor(definition: BindingDefinition<*>, e: Exception)
     : Exception("cannot create $definition", e)
-
-class CannotCreateComponents internal constructor(definition: BindingDefinition<*>, e: Exception)
-    : Exception("cannot create several $definition", e)

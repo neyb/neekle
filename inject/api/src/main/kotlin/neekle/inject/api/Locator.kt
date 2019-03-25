@@ -14,6 +14,7 @@ interface Locator {
     fun <T> getAll(type: Class<T>, name: String?): Collection<T>
 }
 
+
 class NoItemFound(type: Class<*>, name: String?) : Exception("no item found for type $type and name $name")
 
 class SeveralItemsFound(type: Class<*>, name: String?) : Exception("several items found for type $type and name $name")
