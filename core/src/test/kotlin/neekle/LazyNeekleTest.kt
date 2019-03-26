@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test
 
 class LazyNeekleTest {
 
-
-    class A(injector: Injector) {
-        val b by lazy { injector<B>() }
+    class A(val lazyB: () -> B) {
+        val b by lazy(lazyB)
     }
 
     class B {
@@ -24,7 +23,7 @@ class LazyNeekleTest {
 
         val neekle = Neekle {
             bind { B() }
-            bind { A(it) }
+            bind { A(lazy()) }
         }
 
         val a = neekle<A>()

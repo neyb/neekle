@@ -4,25 +4,26 @@ internal class Registry(
         private val injector: Injector
                        ) : Module {
     private val bindings = mutableListOf<Binding<*>>()
-    private val subModules = mutableListOf<Module>()
     private val defaultBindings = mutableListOf<Binding<*>>()
+    private val subModules = mutableListOf<Module>()
 
     fun <T> add(binding: Binding<T>) {
         bindings.add(binding)
     }
 
     fun <T> addDefault(binding: Binding<T>) {
-        bindings.add(binding)
+        defaultBindings.add(binding)
     }
 
     fun add(subModule: Module) {
         subModules += subModule
     }
 
-    override fun <T> getProviders(definition: BindingDefinition<T>) =
-            (bindings.componentProvidersOf(definition) + subModules.flatMap { it.getProviders(definition) })
-                    .takeIf { it.isNotEmpty() }
-                    ?: defaultBindings.componentProvidersOf(definition)
+    override fun <T> getDefaultProviders(definition: BindingDefinition<T>) =
+            defaultBindings.componentProvidersOf(definition) + subModules.flatMap { it.getDefaultProviders(definition) }
+
+    override fun <T> getNonDefaultProviders(definition: BindingDefinition<T>) =
+            bindings.componentProvidersOf(definition) + subModules.flatMap { it.getNonDefaultProviders(definition) }
 
     private fun <T> List<Binding<*>>.componentProvidersOf(definition: BindingDefinition<T>) = this
             .mapNotNull { it.asCandidateForOrNull(definition) }
@@ -32,6 +33,4 @@ internal class Registry(
     //        return bindings.mapNotNull { it.asCandidateForOrNull(definition) } +
     //                bindingFinders.flatMap { it.getBindings(definition) }
     //    }
-
-
 }

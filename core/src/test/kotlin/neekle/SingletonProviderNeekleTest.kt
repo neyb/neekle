@@ -30,7 +30,7 @@ class SingletonProviderNeekleTest {
     @Test fun `singleton can be used in injection`() {
 
         val neekle = Neekle {
-            bind { StringWrapper(it) }
+            bind { StringWrapper(inject()) }
             bind { "value" }
         }
 

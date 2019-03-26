@@ -5,3 +5,6 @@ internal fun <T> Collection<T>.single(defaultProvider: () -> T, severalFilter: (
     1 -> first()
     else -> severalFilter(this)
 }
+
+//internal fun <C : Collection<*>> C.orIfEmpty(otherProvider: () -> C): C =
+//        takeIf { isNotEmpty() } ?: otherProvider()

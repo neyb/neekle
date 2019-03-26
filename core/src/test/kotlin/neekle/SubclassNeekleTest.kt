@@ -20,4 +20,10 @@ class SubclassNeekleTest {
 
         injector.getAll<Any>() shouldEqual listOf("yolo", 3)
     }
+
+    @Test fun `a dependency can be defined in a submodule`() {
+        val neekle = Neekle {
+            bind {}
+        }
+    }
 }

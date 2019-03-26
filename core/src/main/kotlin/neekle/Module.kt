@@ -1,6 +1,7 @@
 package neekle
 
 internal interface Module {
-    fun <T> getProviders(definition: BindingDefinition<T>): List<ComponentProvider<T>>
+    fun <T> getNonDefaultProviders(definition: BindingDefinition<T>): List<ComponentProvider<T>>
+    fun <T> getDefaultProviders(definition: BindingDefinition<T>): List<ComponentProvider<T>>
 }
 

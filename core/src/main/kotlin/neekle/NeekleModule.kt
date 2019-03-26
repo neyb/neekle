@@ -3,9 +3,13 @@ package neekle
 import neekle.ModuleConfigurer.Companion.configure
 
 internal class NeekleModule internal constructor(
-        private val parentInjector: Injector?
+        parents: List<NeekleModule> = emptyList()
+        //        ,
+        //        TODO injector not used...
+        //        private val parentInjector: Injector?
                                                 ) : ConfigurableModule, Module {
-    private val injector: Injector = Injector(this)
+    private val modules = parents + this
+    internal val injector: Injector = Injector(modules)
     private val registry = Registry(injector)
     private val internalRegistry = Registry(injector)
 
@@ -19,9 +23,18 @@ internal class NeekleModule internal constructor(
         registry.addDefault(Binding(definition, initializer))
     }
 
-    override fun submodule(configuration: Configuration) {
-        registry.add(configuration.configure(NeekleModule(injector)))
+    override fun <T> bindInternal(target: Class<T>, name: String?, initializer: ComponentInitializer<T>) {
+        TODO("not implemented")
     }
 
-    override fun <T> getProviders(definition: BindingDefinition<T>) = registry.getProviders(definition)
+    override fun <T> bindInternalDefault(target: Class<T>, name: String?, initializer: ComponentInitializer<T>) {
+        TODO("not implemented")
+    }
+
+    override fun submodule(configuration: Configuration) {
+        registry.add(configuration.configure(NeekleModule(modules)))
+    }
+
+    override fun <T> getNonDefaultProviders(definition: BindingDefinition<T>) = registry.getNonDefaultProviders(definition)
+    override fun <T> getDefaultProviders(definition: BindingDefinition<T>) = registry.getDefaultProviders(definition)
 }

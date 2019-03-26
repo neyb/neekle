@@ -2,18 +2,14 @@ package samples
 
 import io.github.neyb.shoulk.shouldEqual
 import neekle.Configuration
-import neekle.Injector
 import neekle.Neekle
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class UsingDefaultConfigurationTest {
 
-    //TODO restore default support
-    @Test @Disabled("default is not supported without policies right now (it needs an alternate implementation")
-    fun `default configuration can be overriden`() {
+    @Test fun `default configuration can be overriden`() {
         val neekle = Neekle {
-            bind { A("my A", it) }
+            bind { A("my A", inject()) }
             bind { C("my C") }
             submodule(defaultConfiguration)
         }
@@ -26,12 +22,11 @@ class UsingDefaultConfigurationTest {
     }
 
 
-    @Test @Disabled("same as above")
-    fun `when using defaultModule, custom bindings can be done after`() {
+    @Test fun `when using defaultModule, custom bindings can be done after`() {
         val neekle = Neekle {
             defaultModule(defaultConfiguration)
 
-            bind { A("my A", it) }
+            bind { A("my A", inject()) }
             bind { C("my C") }
         }
 
@@ -44,20 +39,14 @@ class UsingDefaultConfigurationTest {
 }
 
 
-class A(val name: String, injector: Injector) {
-    val b: B = injector()
-}
+private class A(val name: String, val b: B)
 
-class B(val name: String, injector: Injector) {
-    val c: C = injector()
-}
+private class B(val name: String, val c: C)
 
-class C(val name: String)
+private class C(val name: String)
 
-val defaultConfiguration: Configuration = {
-    //    onAnyConflict(BindAction.ignore)
-
-    bind { A("default A", it) }
-    bind { B("default B", it) }
-    bind { C("default C") }
+private val defaultConfiguration: Configuration = {
+    bindDefault { A("default A", inject()) }
+    bindDefault { B("default B", inject()) }
+    bindDefault { C("default C") }
 }

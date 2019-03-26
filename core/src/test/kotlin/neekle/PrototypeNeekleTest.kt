@@ -4,13 +4,9 @@ import io.github.neyb.shoulk.shouldEqual
 import org.junit.jupiter.api.Test
 
 class PrototypeNeekleTest {
-    class A(injector: Injector) {
-        val c = injector<C>()
-    }
+    class A(val c:C)
 
-    class B(injector: Injector) {
-        val c = injector<C>()
-    }
+    class B(val c:C)
 
     class C {
         companion object {
@@ -24,8 +20,8 @@ class PrototypeNeekleTest {
 
     @Test fun `prototype create a new instance at every injection`() {
         val neekle = Neekle {
-            bind { A(it) }
-            bind { B(it) }
+            bind { A(inject()) }
+            bind { B(inject()) }
             bind(bindingType = prototype) { C() }
         }
 
