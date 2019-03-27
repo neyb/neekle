@@ -1,7 +1,7 @@
 package neekle
 
 internal object Singleton : BindingType {
-    override fun <T> createProvider(init: (Injector) -> T): ComponentInitializer<T> = SingletonInitializer(init)
+    override fun <T> createInitializer(init: (Injector) -> T): ComponentInitializer<T> = SingletonInitializer(init)
 }
 
 //TODO not threadsafe

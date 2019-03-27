@@ -5,11 +5,7 @@ import org.junit.jupiter.api.Test
 
 class LazyNeekleTest {
 
-    class A(val lazyB: () -> B) {
-        val b by lazy(lazyB)
-    }
-
-    class B {
+    class A {
         companion object {
             var count = 0;
         }
@@ -19,16 +15,20 @@ class LazyNeekleTest {
         }
     }
 
+    class B(lazyA:() -> A) {
+        val a by lazy(lazyA)
+    }
+
     @Test fun `injecting lazyly`() {
 
         val neekle = Neekle {
-            bind { B() }
-            bind { A(lazy()) }
+            bind { B(lazy()) }
+            bind { A() }
         }
 
-        val a = neekle<A>()
-        B.count shouldEqual 0
-        a.b
-        B.count shouldEqual 1
+        val b = neekle<B>()
+        A.count shouldEqual 0
+        b.a
+        A.count shouldEqual 1
     }
 }

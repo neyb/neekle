@@ -3,7 +3,7 @@ package neekle
 import io.github.neyb.shoulk.shouldEqual
 import org.junit.jupiter.api.Test
 
-class NeekleConflictTest {
+class ConflictNeekleTest {
 
 //    @Test fun `registering several binding in conflict should fail`() {
 //        {

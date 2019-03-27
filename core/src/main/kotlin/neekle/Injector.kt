@@ -1,9 +1,7 @@
 package neekle
 
 
-class Injector internal constructor(private val modules: List<NeekleModule>) {
-
-    //    constructor(locator: Locator) : this(LocatorModule(locator))
+class Injector internal constructor(private val modules: List<Registry>) {
 
     inline fun <reified T> get(name: String? = null): T = get(T::class.java, name)
     inline fun <reified T> getAll(name: String? = null): List<T> = getAll(T::class.java, name)
@@ -19,15 +17,14 @@ class Injector internal constructor(private val modules: List<NeekleModule>) {
                         .handledGetComponent(definition)
             }
 
-    //    [type, definition]
     fun <T> getAll(type: Class<T>, name: String? = null): List<T> =
             BindingDefinition(type, name).let { definition ->
                 getProviders(definition).map { it.handledGetComponent(definition) }
             }
 
     private fun <T> getProviders(definition: BindingDefinition<T>) =
-            modules.flatMap { it.getNonDefaultProviders(definition) }
-                    .ifEmpty { modules.flatMap { it.getDefaultProviders(definition) } }
+            modules.flatMap { it.getNonDefaultProviders(definition, this) }
+                    .ifEmpty { modules.flatMap { it.getDefaultProviders(definition, this) } }
 
     private fun <T> ComponentProvider<T>.handledGetComponent(definition: BindingDefinition<*>) =
             try {

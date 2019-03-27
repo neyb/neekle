@@ -42,7 +42,8 @@ class BasicNeekleTest {
             bind { StringWrapper(inject()) }
         }
 
-        ({ neekle<StringWrapper>() } shouldThrow CannotCreateComponent::class).withCauses() shouldMatchInOrder listOf(
+        ({ neekle<StringWrapper>() } shouldThrow CannotCreateComponent::class)
+                .withCauses() shouldMatchInOrder listOf(
                 match { it is CannotCreateComponent && it.message == "cannot create =>test.StringWrapper" },
                 match { it is NoComponentFound && it.message == "no component found for =>java.lang.String" })
     }

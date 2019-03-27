@@ -2,16 +2,11 @@ package neekle
 
 import neekle.ModuleConfigurer.Companion.configure
 
-internal class NeekleModule internal constructor(
-        parents: List<NeekleModule> = emptyList()
-        //        ,
-        //        TODO injector not used...
-        //        private val parentInjector: Injector?
-                                                ) : ConfigurableModule, Module {
-    private val modules = parents + this
-    internal val injector: Injector = Injector(modules)
-    private val registry = Registry(injector)
-    private val internalRegistry = Registry(injector)
+internal class NeekleModule(private val parents: List<NeekleModule> = emptyList()) : ConfigurableModule, Module {
+    private val registry = Registry()
+    private val internalRegistry = Registry()
+    internal val injector = Injector(parents.flatMap { listOf(it.registry, it.internalRegistry) }
+                                             + registry + internalRegistry)
 
     override fun <T> bind(target: Class<T>, name: String?, initializer: ComponentInitializer<T>) {
         val definition = BindingDefinition(target, name)
@@ -24,17 +19,20 @@ internal class NeekleModule internal constructor(
     }
 
     override fun <T> bindInternal(target: Class<T>, name: String?, initializer: ComponentInitializer<T>) {
-        TODO("not implemented")
+        internalRegistry.add(Binding(BindingDefinition(target, name), initializer))
     }
 
     override fun <T> bindInternalDefault(target: Class<T>, name: String?, initializer: ComponentInitializer<T>) {
-        TODO("not implemented")
+        internalRegistry.addDefault(Binding(BindingDefinition(target, name), initializer))
     }
 
     override fun submodule(configuration: Configuration) {
-        registry.add(configuration.configure(NeekleModule(modules)))
+        registry.add(configuration.configure(NeekleModule(parents + this)))
     }
 
-    override fun <T> getNonDefaultProviders(definition: BindingDefinition<T>) = registry.getNonDefaultProviders(definition)
-    override fun <T> getDefaultProviders(definition: BindingDefinition<T>) = registry.getDefaultProviders(definition)
+    override fun <T> getNonDefaultProviders(definition: BindingDefinition<T>) =
+            registry.getNonDefaultProviders(definition, this.injector)
+
+    override fun <T> getDefaultProviders(definition: BindingDefinition<T>) =
+            registry.getDefaultProviders(definition, this.injector)
 }

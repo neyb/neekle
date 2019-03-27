@@ -1,5 +1,5 @@
 package neekle
 
 interface BindingType {
-    fun <T> createProvider(init: (Injector) -> T): ComponentInitializer<T>
+    fun <T> createInitializer(init: (Injector) -> T): ComponentInitializer<T>
 }

@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_VARIABLE")
+
 package neekle
 
 import io.github.neyb.shoulk.shouldEqual

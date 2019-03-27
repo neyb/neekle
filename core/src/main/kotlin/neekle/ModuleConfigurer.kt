@@ -22,25 +22,25 @@ class ModuleConfigurer private constructor(module: ConfigurableModule) : Configu
             name: String? = null,
             bindingType: BindingType = singleton,
             noinline init: Injector.() -> T) =
-            bind(T::class.java, name, bindingType.createProvider(init))
+            bind(T::class.java, name, bindingType.createInitializer(init))
 
     inline fun <reified T> bindDefault(
             name: String? = null,
             bindingType: BindingType = singleton,
             noinline init: Injector.() -> T) =
-            bindDefault(T::class.java, name, bindingType.createProvider(init))
+            bindDefault(T::class.java, name, bindingType.createInitializer(init))
 
     inline fun <reified T> bindInternal(
             name: String? = null,
             bindingType: BindingType = singleton,
             noinline init: Injector.() -> T) =
-            bindInternal(T::class.java, name, bindingType.createProvider(init))
+            bindInternal(T::class.java, name, bindingType.createInitializer(init))
 
     inline fun <reified T> bindInternalDefault(
             name: String? = null,
             bindingType: BindingType = singleton,
             noinline init: Injector.() -> T) =
-            bindInternalDefault(T::class.java, name, bindingType.createProvider(init))
+            bindInternalDefault(T::class.java, name, bindingType.createInitializer(init))
 
     private fun configure(configuration: Configuration) {
         this.configuration()
