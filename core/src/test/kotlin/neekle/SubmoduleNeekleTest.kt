@@ -14,7 +14,6 @@ import test.withCauses
 
 class SubmoduleNeekleTest {
 
-    @Disabled
     @Test fun `binding a component in a submodule get be used`() {
         val neekle = Neekle {
             submodule {
@@ -25,7 +24,6 @@ class SubmoduleNeekleTest {
         neekle<String>() shouldEqual "value"
     }
 
-    @Disabled
     @Test fun `a component can find its dependency in a submodule`() {
         val neekle = Neekle {
             submodule {
@@ -39,7 +37,6 @@ class SubmoduleNeekleTest {
         neekle<B>() shouldNotBe null
     }
 
-    @Disabled
     @Test fun `a component can find its dependency in a supermodule`() {
         val neekle = Neekle {
             submodule {
@@ -53,8 +50,7 @@ class SubmoduleNeekleTest {
         neekle<B>() shouldNotBe null
     }
 
-    @Disabled
-    @Test fun `an internal component cannot be access from a parent`() {
+    @Test fun `internal component cannot be accessed from a parent`() {
         val neekle = Neekle {
             submodule {
                 bindInternal { A() }
@@ -68,16 +64,26 @@ class SubmoduleNeekleTest {
                 match { it is NoComponentFound && it.message == "no component found for =>test.A" })
     }
 
-    @Test fun `this mecanism can be used to select what we want to show from our submodule`() {
+    @Test fun `internal component can be accessed from submodule`() {
         val neekle = Neekle {
             submodule {
-                bind { B(inject()) } //B is exposed
-                bindInternal { A() } //A is not
+                bindInternal { A() }
+                submodule {
+                    bind { B(inject()) }
+                }
             }
-            bind { C(inject()) }
         }
 
-        neekle<C>() shouldNotBe null
+        neekle<B>() shouldNotBe null
+    }
+
+    @Test
+    internal fun `internal component at top level cannot be accessed from outside`() {
+        val neekle = Neekle {
+            bindInternal { A() }
+        };
+
+        { neekle<A>() } shouldThrow NoComponentFound::class
     }
 
     //    @Test fun `conflict can occure with a submodule`() {
